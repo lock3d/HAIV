@@ -1,0 +1,8 @@
+# Only vE and vF are published; every other folder here stays local.
+/*
+!/vE/
+!/vF/
+!/README.md
+!/OFL.txt
+!/.gitignore
+.DS_Store

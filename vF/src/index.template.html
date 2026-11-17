@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HAIV: Human-AI Venture</title>
+<style>
+/*__CSS__*/
+</style>
+</head>
+<body>
+<a class="skip" id="skip" href="#play">Skip to the stage controls</a>
+<div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
+<div class="app" id="app" data-rack="open" data-rail="open" data-dock="open">
+
+  <header class="topbar">
+    <div class="top-left">
+    <button class="btn icon" id="rackToggle" aria-expanded="true" aria-controls="rack" title="Show or hide the parameter panel" aria-label="Parameters">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/><circle cx="5.5" cy="4" r="1.6" fill="var(--surface)"/><circle cx="10.5" cy="8" r="1.6" fill="var(--surface)"/><circle cx="6.5" cy="12" r="1.6" fill="var(--surface)"/></svg>
+    </button>
+    <div class="brand">
+      <div class="brand-text"><h1 class="brand-name">HAIV: Human-AI Venture</h1><span class="brand-sub">Organizing Intelligence Playground</span></div>
+    </div>
+    <span class="chip" id="regime" title="How the AI compares with people (paper, section 2.3)"><i></i><span></span></span>
+    </div>
+    <div class="top-mid">
+    <label class="scene-pick"><span class="lbl">Scene</span><select id="scene" aria-label="Scene"></select></label>
+      <button class="btn" id="briefBtn" title="A plain-language summary of this scenario, ready to copy">Brief</button>
+      <button class="btn" id="pinBtn" title="Keep this scenario as A and compare what you change against it">Pin as A</button>
+    </div>
+    <div class="top-right">
+    <span class="chip" id="trustChip" hidden><i></i><span></span></span>
+    <span class="chip" id="interChip" hidden><i></i><span>Links</span></span>
+    <span class="chip" id="reskillChip" hidden><i></i><span>Reskilling</span></span>
+    <span class="chip" id="policyChip" hidden><i></i><span>Policy</span></span>
+    <div class="top-actions">
+      <button class="btn" id="aboutBtn">About<span class="long"> the model</span></button>
+      <button class="btn icon" id="themeBtn" title="Theme: auto" aria-label="Switch theme">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5a5.5 5.5 0 0 0 0 11z" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <button class="btn icon" id="railToggle" aria-expanded="true" aria-controls="rail" title="Show or hide the readouts" aria-label="Readouts">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M10 3v10"/></svg>
+      </button>
+    </div>
+    </div>
+  </header>
+
+  <aside class="rack" id="rack" aria-label="Parameters"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main class="center">
+    <section class="kpis" id="kpis" aria-label="Headline numbers"></section>
+    <section class="progress" id="progress" aria-label="AI progress">
+      <div class="dock-bar">
+        <button class="btn icon" id="play" title="Play AI progress" aria-label="Play AI progress"><svg viewBox="0 0 16 16"><path d="M5 3.5v9l7-4.5z" fill="currentColor"/></svg></button>
+        <span class="lbl">AI progress</span>
+        <input type="range" class="scrub" id="scrub" min="0" max="1000" step="1" value="0" aria-label="Position along the AI progress path">
+        <span class="num tval" id="tval">0%</span>
+        <span class="pathsum" id="pathsum"></span>
+        <button class="btn quiet" id="pathBtn" aria-expanded="false" aria-controls="pathEdit">Edit path</button>
+        <button class="btn icon" id="dockToggle" title="Show or hide the charts" aria-label="Show or hide the charts" aria-expanded="true"><svg viewBox="0 0 16 16"><path d="M2.5 2.5v11h11M5 10.5l2.5-3.5 2.2 2L13 4.5"/></svg></button>
+      </div>
+      <div class="path-edit" id="pathEdit" hidden></div>
+    </section>
+    <section class="stage" id="stage" aria-label="Firms and agents">
+      <canvas id="world" role="img" aria-label="Every person and AI agent, grouped into firms"></canvas>
+      <div class="overlay note" id="note"></div>
+      <div class="overlay note-tab" id="noteTab" hidden><button class="btn" id="noteOpen">About this scene</button></div>
+      <div class="overlay ab" id="ab" hidden>
+        <span class="lbl">Stage shows</span>
+        <span class="seg" role="group" aria-label="Which scenario the stage shows"><button id="abA" aria-pressed="false">A pinned</button><button id="abB" aria-pressed="true">Now</button></span>
+        <button class="btn quiet icon" id="unpin" title="Remove the pin" aria-label="Remove the pin"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+      </div>
+      <div class="overlay legend" id="legend" role="group" aria-label="Legend"></div>
+      <div class="overlay zoom" id="zoom" role="group" aria-label="Zoom. With one of these buttons focused, the arrow keys move the view.">
+        <button class="btn icon" id="zin" title="Zoom in (arrow keys move the view)" aria-label="Zoom in"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg></button>
+        <button class="btn icon" id="zout" title="Zoom out (arrow keys move the view)" aria-label="Zoom out"><svg viewBox="0 0 16 16"><path d="M3 8h10"/></svg></button>
+        <button class="btn icon" id="zfit" title="Fit everything" aria-label="Fit everything"><svg viewBox="0 0 16 16"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg></button>
+      </div>
+      <div class="overlay empty-msg" id="emptyMsg" hidden><div></div></div>
+      <div class="overlay alert" id="solveAlert" role="alert" hidden></div>
+      <div class="tip" id="tip" hidden></div>
+    </section>
+    <section class="dock" id="dock" aria-label="Charts along the AI progress path">
+      <div class="strips" id="strips"></div>
+    </section>
+  </main>
+
+  <aside class="rail" id="rail" aria-label="Readouts"></aside>
+</div>
+
+<dialog id="about" aria-labelledby="aboutT">
+  <div class="dlg-head"><h2 id="aboutT">About the model</h2><button class="btn quiet icon" data-close aria-label="Close"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+  <div class="dlg-body">
+    <p>HAIV runs the model from <em>Organizing Intelligence</em> (Imas, Koh and Legg, Google DeepMind, 2026). People and AI copies sort themselves into competing firms; what you see on the stage is the industry that maximises total surplus, which the paper shows is the equilibrium (Theorem 1).</p>
+    <h3>Production</h3>
+    <p>An agent is a person or an AI copy. Every agent has two task skills and a coordination capability. A firm of size <code>m</code> with mean skills <code>(y1, y2)</code> and mean coordination <code>z</code> produces</p>
+    <p><code>F = L(y1, y2) &times; m (1+m)^(z&minus;1) e^(&phi; m / (1+m))</code>, with <code>L = ((y1^&rho; + y2^&rho;)/2)^(1/&rho;)</code>.</p>
+    <p>Competence <code>L</code> shifts output per head up or down. Coordination <code>z</code> bends the scale curve: below one, output per head peaks at the preferred size <code>m* = &phi;/(1&minus;z) &minus; 1</code> (the Coasean ceiling); above one it rises without limit, and a firm grows until it is as large as its market.</p>
+    <h3>People and AI</h3>
+    <p>People are in fixed supply, so scarce capabilities earn a premium over the outside option. AI copies can be rented at the compute cost, so identical copies never earn that premium. Demand is linear: the price falls from the top willingness to pay to zero at the market&rsquo;s size.</p>
+    <h3>How it is solved</h3>
+    <p>For a given output, the cheapest industry is a linear programme over firm recipes (a mix of roles and a size), exactly as in the paper&rsquo;s activity analysis. Wages and the compute rent are its shadow values; output is then chosen to maximise surplus. The solver reproduces the figures printed in the paper, including Table 4 and the displacement thresholds.</p>
+    <h3>Organisation rules</h3>
+    <p>The rules restrict which firms may exist: everyone solo, a fixed or capped size, one organisation, no human&ndash;AI mixing, no cross-role teams, a minimum human share. The solver then finds the best industry inside the rule, so the gap to the free equilibrium is the cost of that structure. The structure league in the readouts runs all of them side by side.</p>
+    <h3>Reading the stage</h3>
+    <p>Every mark is one person or one AI copy; every hexagon is one firm. Firm types stand in a row from human-only on the left to AI-only on the right. People no firm would pay more than the outside option, and copies that are not rented, wait in the pools underneath. When you change something, each agent keeps its seat if it can and travels only if it has to.</p>
+    <h3>What is added to the paper</h3>
+    <ul>
+      <li><strong>Fleet limit.</strong> The paper lets AI be copied without limit. Here the fleet is capped at up to 100,000; when the cap binds, compute earns a rent.</li>
+      <li><strong>Jaggedness and individual variation.</strong> Jaggedness scales how far each role&rsquo;s two skills sit from their average. Individual variation spreads people around their role; their pay follows the paper&rsquo;s affine bid schedule (Theorem 2) and the least valuable are the first outside firms.</li>
+      <li><strong>Whole firms.</strong> The paper allows fractional firm counts. Numbers on this page use those; the stage rounds them to whole firms and whole people.</li>
+      <li><strong>Trust</strong>, <strong>Intercompany</strong>, <strong>Reskilling</strong> and <strong>Policy.</strong> All off unless you switch them on; see below.</li>
+      <li><strong>Who gets what.</strong> The paper measures how much is produced. The readout of that name shows who receives it: buyers, people through pay, people as dividends, and the fleet&rsquo;s outside owners, with income per person and the Gini index of inequality between people.</li>
+    </ul>
+    <h3>Trust</h3>
+    <p>The paper has no trust in it: people and AI copies work together without friction. With the switch on, trust is the share of AI decisions people act on without checking, from 0 to 1. What the AI warrants is how often its call beats the average person&rsquo;s, <code>q = L_AI / (L_AI + L_people)</code>, taken from their competence.</p>
+    <p>Only the gap between trust and <code>q</code> matters, and only where people and AI work together. In a firm with human share <code>h</code>, a share <code>x = 2h(1&minus;h)</code> of working pairs joins a person and a copy. Then:</p>
+    <ul>
+      <li><strong>Speed.</strong> More trust means less back-and-forth, so mixed teams coordinate faster: <code>z + 0.5 &times; x &times; gap</code>. Less trust slows them.</li>
+      <li><strong>Errors.</strong> Trust above what the AI warrants lets its mistakes through: <code>L &times; (1 &minus; 1.5 &times; x &times; gap)</code>.</li>
+      <li><strong>Oversight.</strong> Trust below it keeps people in the loop: every firm must be at least <code>0.5 &times; |gap|</code> human, so no firm runs on AI alone.</li>
+    </ul>
+    <p>At a gap of zero all three vanish and the result is the paper&rsquo;s. Firm sizes, who works with whom, AI use and wages then follow from the solver as before. The three strengths are this sandbox&rsquo;s assumptions, not estimates from data.</p>
+    <h3>Intercompany</h3>
+    <p>In the paper firms do not work together. With the switch on, firms link into networks, and links work like coordination inside a firm, one level up: firms are to a network what agents are to a firm. A firm with <code>n</code> partner firms multiplies its output per agent by</p>
+    <p><code>H = (1+n)^(&zeta;&minus;1) &times; e^(&psi; n / (1+n))</code>,</p>
+    <p>the paper&rsquo;s scale curve again. <code>&psi;</code> is what linking adds and <code>&zeta;</code> is how well coordination carries across firm boundaries, so a network has a preferred number of partners, <code>n* = &psi;/(1&minus;&zeta;) &minus; 1</code>, and none at all when <code>&psi;</code> is below <code>1&minus;&zeta;</code>. The three kinds of link each set one part of it:</p>
+    <ul>
+      <li><strong>Goods and inventory transfers.</strong> Dividing work across firms: a share of the gain from dividing work inside one, <code>&psi; = goods &times; &phi;</code>.</li>
+      <li><strong>IP licensing.</strong> What a firm&rsquo;s best people know is shared across its network. Each task skill moves from the firm&rsquo;s average toward its skill-weighted average (each person counted by how good they are at the task). The competence this adds, in logs, is added to <code>&psi;</code>. Firms whose people all have the same skills gain nothing.</li>
+      <li><strong>Shared services.</strong> Centralised support carries a firm&rsquo;s own coordination across its boundary: <code>&zeta; = services &times; z</code>.</li>
+    </ul>
+    <p>A network cannot have more firms than its market or the headcount allows. Where headcount is short, firms choose their size and their partners together; where the market is, a firm keeps its size and has fewer partners. With Trust on as well, a mixed firm&rsquo;s links inherit its slower or faster coordination. The mapping of the three links onto the curve is this sandbox&rsquo;s assumption, not an estimate from data.</p>
+    <h3>Reskilling</h3>
+    <p>In the paper a person keeps their role. With the switch on, anyone may retrain into another role at a cost <code>&kappa;</code> a person, and then works with that role&rsquo;s skills and coordination. In the solver this is one more activity for every pair of roles, &ldquo;move a person from role <code>i</code> to role <code>j</code>&rdquo;, which costs <code>&kappa;</code> and changes both headcounts. Wages, as shadow values, then obey <code>wage<sub>j</sub> &minus; wage<sub>i</sub> &le; &kappa;</code> for every pair, with equality wherever people move. A role&rsquo;s wage is then what its people take home after paying for retraining. A role nobody starts in can be retrained into; a leading role is left out, and so is the rule of one organisation. No firm may need more people in a role than the role ends up with.</p>
+    <h3>Policy</h3>
+    <p>Two ways of sharing what AI earns, both off in the paper.</p>
+    <ul>
+      <li><strong>A tax on compute.</strong> Firms pay <code>r(1 + tax)</code> for a copy that costs <code>r</code> to run. The equilibrium is the industry that is best at that cost; the revenue is not lost but paid back to people in equal shares, so it counts in total surplus. A tax smaller than the rent scarce copies already earn changes no firm, only who receives the rents; a larger one makes firms rent fewer copies.</li>
+      <li><strong>A stake in the fleet.</strong> When the fleet is capped and the cap binds, copies earn a rent above their cost. The stake is the share of that rent that belongs to people, in equal shares; the rest goes to the fleet&rsquo;s outside owners. It moves income and never changes a firm.</li>
+    </ul>
+    <h3>Two terms</h3>
+    <p><strong>Concentration</strong> is the Herfindahl index (HHI): near 0 when output is spread over many firms, 1 when a single firm makes all of it. A <strong>wage</strong> is what one more person in a role would add to total surplus; economists call this a shadow value.</p>
+    <h3>Reading it with care</h3>
+    <p>These are outcomes of a stylised model, not forecasts. Units are those of the paper&rsquo;s example: one AI copy costs one unit of output value per period.</p>
+  </div>
+</dialog>
+
+<dialog id="briefDlg" aria-labelledby="briefT">
+  <div class="dlg-head"><h2 id="briefT">Scenario brief</h2><button class="btn quiet icon" data-close aria-label="Close"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+  <div class="dlg-body">
+    <p>A plain-language description of the current settings and results. Paste it into a chat or a note.</p>
+    <textarea class="brief" id="briefText" readonly aria-label="Scenario brief"></textarea>
+    <p style="margin-top:10px"><button class="btn on" id="briefCopy">Copy</button></p>
+  </div>
+</dialog>
+
+<script>
+/*__JS__*/
+</script>
+</body>
+</html>
